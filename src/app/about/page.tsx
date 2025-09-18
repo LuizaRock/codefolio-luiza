@@ -1,27 +1,25 @@
-import { getPostBySlug } from "@/lib/posts";
-import { notFound } from "next/navigation";
+"use client";
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = getPostBySlug(params.slug);
-  if (!post) return { title: "Post não encontrado" };
-  return {
-    title: `${post.title} — Blog da Luiza`,
-    description: post.excerpt,
-  };
-}
+import { useState } from "react";
+import Modal from "@/components/Modal";
 
-export default function PostPage({ params }: { params: { slug: string } }) {
-  const post = getPostBySlug(params.slug);
-
-  if (!post) {
-    notFound();
-  }
+export default function AboutPage() {
+  const [open, setOpen] = useState(false);
 
   return (
-    <article className="prose prose-zinc max-w-none">
-      <h1>{post.title}</h1>
-      <p className="text-sm text-zinc-500">{post.date} — {post.author}</p>
-      <div dangerouslySetInnerHTML={{ __html: post.content }} />
-    </article>
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">About</h1>
+
+      <button
+        onClick={() => setOpen(true)}
+        className="rounded-xl bg-pink-500 text-white px-4 py-2 hover:bg-pink-600"
+      >
+        Abrir modal (About)
+      </button>
+
+      <Modal open={open} onClose={() => setOpen(false)} title="Sobre a Luiza">
+        <p>Aqui você pode colocar contato, CV, foto, etc.</p>
+      </Modal>
+    </div>
   );
 }
