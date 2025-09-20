@@ -1,25 +1,22 @@
-"use client";
-
-import { useState } from "react";
-import Modal from "@/components/Modal";
+import Link from "next/link";
+import { posts } from "@/lib/posts";
+import PostCard from "@/components/PostCard";
 
 export default function HomePage() {
-  const [open, setOpen] = useState(false);
-
+  const latest = posts.slice(0, 3);
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Home</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">Últimos posts</h1>
 
-      <button
-        onClick={() => setOpen(true)}
-        className="rounded-xl bg-pink-500 text-white px-4 py-2 hover:bg-pink-600"
-      >
-        Abrir modal (Home)
-      </button>
+      <div className="grid gap-4">
+        {latest.map((p) => (
+          <PostCard key={p.slug} post={p} />
+        ))}
+      </div>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Home">
-        <p>Conteúdo do modal da Home. Customize à vontade.</p>
-      </Modal>
+      <Link href="/blog" className="inline-block rounded-lg border px-4 py-2">
+        Ver todos
+      </Link>
     </div>
   );
 }

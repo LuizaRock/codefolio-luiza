@@ -1,25 +1,25 @@
-"use client";
+import { posts } from "@/lib/posts";
+import Link from "next/link";
 
-import { useState } from "react";
-import Modal from "@/components/Modal";
+export const metadata = { title: "Blog — Luiza" };
 
 export default function BlogPage() {
-  const [open, setOpen] = useState(false);
-
   return (
-    <div className="space-y-4">
+    <section className="space-y-6">
       <h1 className="text-2xl font-bold">Blog</h1>
-
-      <button
-        onClick={() => setOpen(true)}
-        className="rounded-xl bg-pink-500 text-white px-4 py-2 hover:bg-pink-600"
-      >
-        Abrir modal (Blog)
-      </button>
-
-      <Modal open={open} onClose={() => setOpen(false)} title="Notas do Blog">
-        <p>Use isso pra filtros, newsletter, preview de post, etc.</p>
-      </Modal>
-    </div>
+      <ul className="grid gap-4">
+        {posts.map((p) => (
+          <li key={p.slug} className="rounded-lg border p-4 hover:bg-zinc-50">
+            <Link className="font-medium underline" href={`/posts/${p.slug}`}>
+              {p.title}
+            </Link>
+            <div className="text-xs text-zinc-500">
+              {new Date(p.date).toLocaleDateString("pt-PT")} • {p.author}
+            </div>
+            <p className="text-sm text-zinc-700 mt-1">{p.excerpt}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
