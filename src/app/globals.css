@@ -1,3 +1,39 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@layer base {
+  html, body { height: 100%; min-height: 100%; font-family: ui-sans-serif, system-ui, sans-serif; }
+}
+
+@layer components {
+  .card { @apply bg-white rounded-2xl border border-zinc-200 shadow-xl p-8; }
+
+  /* Gradiente animado – tudo numa classe só */
+  .bg-soft-gradient {
+    background-image: linear-gradient(135deg, #ffffff, #efe7ff 30%, #9ccef5 60%, #000390);
+    background-size: 350% 350%;
+    animation: gradientMove 10s linear infinite;
+  }
+}
+
+@layer utilities {
+  /* (opcional) se quiser usar a animação separada em outros fundos */
+  .animate-gradient {
+    background-size: 350% 350%;
+    animation: gradientMove 10s ease-in-out infinite;
+  }
+
+  @keyframes gradientMove {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}
+@keyframes bounceOnce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-bounce-once {
+  animation: bounceOnce 0.3s ease;
+}
+

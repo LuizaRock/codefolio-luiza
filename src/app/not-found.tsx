@@ -1,8 +1,7 @@
 export default function NotFound() {
   return (
     // As classes para centralizar o conteúdo vêm para este container
-    <div className="min-h-screen flex flex-col items-center justify-center text-center">
-      <h1 className="text-6xl font-bold text-zinc-800 drop-shadow">404</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center text-center bg-soft-gradient">      <h1 className="text-6xl font-bold text-zinc-800 drop-shadow">404</h1>
       <h2 className="text-2xl font-semibold mt-2">Página não encontrada</h2>
       <p className="text-zinc-600 mt-2">
         O conteúdo que você tentou abrir não existe ou foi movido.

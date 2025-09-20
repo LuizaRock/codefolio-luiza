@@ -1,25 +1,20 @@
-import { posts } from "@/lib/posts";
-import Link from "next/link";
-
-export const metadata = { title: "Blog — Luiza" };
+import NewPostForm from "@/components/NewPostForm";
+import ExtraPosts from "@/components/ExtraPosts";
 
 export default function BlogPage() {
   return (
-    <section className="space-y-6">
-      <h1 className="text-2xl font-bold">Blog</h1>
-      <ul className="grid gap-4">
-        {posts.map((p) => (
-          <li key={p.slug} className="rounded-lg border p-4 hover:bg-zinc-50">
-            <Link className="font-medium underline" href={`/posts/${p.slug}`}>
-              {p.title}
-            </Link>
-            <div className="text-xs text-zinc-500">
-              {new Date(p.date).toLocaleDateString("pt-PT")} • {p.author}
-            </div>
-            <p className="text-sm text-zinc-700 mt-1">{p.excerpt}</p>
-          </li>
-        ))}
-      </ul>
+    <section className="space-y-8">
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold">Blog</h1>
+        <p className="text-zinc-700">Estudos, reflexões e projetos em andamento.</p>
+      </div>
+
+      <NewPostForm />
+
+      {/* Todos os posts (fixos + novos), já com botão apagar */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <ExtraPosts />
+      </div>
     </section>
   );
 }
