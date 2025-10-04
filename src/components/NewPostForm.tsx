@@ -1,15 +1,14 @@
+// src/components/NewPostForm.tsx
 "use client";
-import PostForm from "@/components/PostForm";
+import PostForm, { type PostFormOutput } from "@/components/PostForm";
 
 export default function NewPostForm() {
-  function savePost(p: any) {
+  function savePost(p: PostFormOutput) {
     try {
-      const arr = JSON.parse(localStorage.getItem("extraPosts") || "[]");
+      const arr: PostFormOutput[] = JSON.parse(localStorage.getItem("extraPosts") || "[]");
       arr.push(p);
       localStorage.setItem("extraPosts", JSON.stringify(arr));
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
 
   return (

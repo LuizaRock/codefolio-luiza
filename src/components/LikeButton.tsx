@@ -1,27 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function LikeButton() {
-  const [likes, setLikes] = useState(0);
-  const [animate, setAnimate] = useState(false);
+type Props = {
+  slug: string;        // usado pra salvar por post
+  initial?: number;    // opcional
+};
+
+export default function LikeButton({ slug, initial = 0 }: Props) {
+  const storageKey = `likes:${slug}`;
+  const [count, setCount] = useState(initial);
+  const [pressed, setPressed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = Number(localStorage.getItem(storageKey));
+      if (!Number.isNaN(saved) && saved > 0) setCount(saved);
+    } catch {}
+  }, [storageKey]);
 
   function handleClick() {
-    setLikes(likes + 1);
-    setAnimate(true);
-    setTimeout(() => setAnimate(false), 300); // reseta animação
+    if (pressed) return;            // evita spam durante animação
+    setPressed(true);
+    setCount((c) => {
+      const next = c + 1;
+      try { localStorage.setItem(storageKey, String(next)); } catch {}
+      return next;
+    });
+    setTimeout(() => setPressed(false), 200);
   }
 
   return (
     <button
+      type="button"
       onClick={handleClick}
-      className="flex items-center gap-2 px-4 py-2 rounded-lg
-                 bg-blue-500 text-white font-medium hover:bg-blue-600 transition"
+      aria-pressed={pressed}
+      aria-label="Curtir este post"
+      className={[
+        "inline-flex items-center gap-2 rounded-full border px-4 py-2",
+        "transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        pressed ? "scale-105" : "hover:scale-105",
+      ].join(" ")}
     >
-      <span className={`text-xl ${animate ? "animate-bounce-once" : ""}`}>
-        👍
+      <span
+        className={[
+          "text-xl leading-none transition-transform",
+          pressed ? "translate-y-[-1px] scale-125" : "",
+        ].join(" ")}
+      >
+        ❤️
       </span>
-      Curtir {likes > 0 && `(${likes})`}
+      <span className="text-sm font-medium">{count}</span>
     </button>
   );
 }

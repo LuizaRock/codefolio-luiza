@@ -1,101 +1,74 @@
+// src/components/PostsGridClient.tsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { Post } from "@/types/post";
 
-const LS_USER_POSTS = "extraPosts";
-const LS_DELETED = "deletedSlugs";
 
 export default function PostsGridClient({ seeds }: { seeds: Post[] }) {
-  const [userPosts, setUserPosts] = useState<Post[]>([]);
-  const [deleted, setDeleted] = useState<string[]>([]);
-
-  // Set de slugs dos seeds (para sabermos quem NÃO pode ser apagado)
-  const seedSlugs = useMemo(() => new Set(seeds.map(s => s.slug)), [seeds]);
-
-  useEffect(() => {
-    try {
-      const up = JSON.parse(localStorage.getItem(LS_USER_POSTS) || "[]");
-      const del = JSON.parse(localStorage.getItem(LS_DELETED) || "[]");
-
-      if (Array.isArray(up) && up.length > 0) setUserPosts(up);
-      if (Array.isArray(del)) setDeleted(del.filter((s: string) => !seedSlugs.has(s))); // filtra seeds
-    } catch {}
-  }, [seedSlugs]);
-
-  const merged = useMemo(() => {
-    const map = new Map<string, Post>();
-    // seeds sempre entram
-    for (const p of seeds) map.set(p.slug, p);
-    // posts do usuário sobrescrevem
-    for (const p of userPosts) map.set(p.slug, p);
-    // deletados removem APENAS posts do usuário
-    for (const s of deleted) {
-      if (!seedSlugs.has(s)) map.delete(s);
-    }
-    return Array.from(map.values()).sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-  }, [seeds, userPosts, deleted, seedSlugs]);
-
-  const previewFromHTML = (html: string, max = 120) => {
-    const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-    return text.length > max ? text.slice(0, max) + "…" : text;
-  };
-
-  function handleDelete(slug: string) {
-    // só permite apagar posts do usuário
-    if (seedSlugs.has(slug)) return;
-    const next = Array.from(new Set([...deleted, slug]));
-    setDeleted(next);
-    try { localStorage.setItem(LS_DELETED, JSON.stringify(next)); } catch {}
-  }
-
-  const isUserPost = (slug: string) => !seedSlugs.has(slug);
-
   return (
-    <section className="space-y-12">
+    <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6 space-y-12">
       <div className="card space-y-4 text-center p-8">
-        <h1 className="text-4xl font-bold">Bem-vindo ao CodeFolio</h1>
-        <p className="text-lg text-zinc-700 leading-relaxed max-w-2xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
+          Bem-vindo ao CodeFolio
+        </h1>
+        <p className="text-base sm:text-lg text-zinc-900 leading-relaxed max-w-2xl mx-auto">
           Um blog pessoal simples em Next.js para compartilhar estudos, ideias e projetos.
         </p>
         <div className="flex justify-center mt-4">
-          <img
+          <Image
             src="/images/dev.gif"
-            alt="Animação"
-            className="w-28 md:w-40 rounded-lg shadow-lg"
+            alt="Animação de desenvolvimento"
+            width={160}
+            height={160}
+            className="w-28 md:w-40 h-auto rounded-lg shadow-lg"
+            priority
           />
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {merged.map((p) => (
-          <div
-            key={p.slug}
-            className="card p-6 border border-zinc-200 rounded-xl shadow-sm hover:shadow-md hover:scale-[1.02] transition-all"
-          >
-            <Link href={`/posts/${p.slug}`}>
-              <h2 className="text-xl font-semibold text-zinc-800">{p.title}</h2>
-              <p className="text-sm text-zinc-500">{p.date} • {p.author}</p>
-              <p className="text-zinc-700 mt-3">{previewFromHTML(p.content)}</p>
-            </Link>
+      {/* Grid responsivo: 1 → 2 → 3 colunas */}
+      <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {seeds.map((p) => {
+          const d = new Date(p.date);
+          const formatted = isNaN(d.getTime())
+            ? p.date
+            : d.toLocaleDateString("pt-PT", {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+              });
 
-            {/* Botão Apagar só aparece para posts do usuário */}
-            {isUserPost(p.slug) && (
-              <div className="mt-3 flex justify-end">
-                <button
-                  onClick={() => handleDelete(p.slug)}
-                  className="text-rose-600 text-sm hover:underline"
-                >
-                  Apagar
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+          return (
+            <li
+              key={p.slug}
+              className="card p-6 border border-zinc-200 rounded-xl shadow-sm transition hover:shadow-md hover:scale-[1.02] focus-within:shadow-md"
+            >
+              <Link
+                href={`/posts/${p.slug}`}
+                className="group outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-md"
+                aria-label={`Abrir post: ${p.title}`}
+              >
+                <h2 className="text-lg sm:text-xl font-semibold text-zinc-900 group-hover:underline">
+                  {p.title}
+                </h2>
+                <p className="mt-1 text-xs sm:text-sm text-zinc-800">
+                  <time dateTime={p.date}>{formatted}</time> • {p.author}
+                </p>
+                {p.excerpt && (
+                  <p className="mt-3 text-sm leading-relaxed text-zinc-900">
+                    {p.excerpt}
+                  </p>
+                )}
+                <span className="mt-4 inline-block text-sm font-medium text-blue-700 group-hover:underline">
+                  Ler post →
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

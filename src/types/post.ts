@@ -2,8 +2,8 @@
 export type Post = {
   slug: string;
   title: string;
+  date: string;     // ISO
+  author: string;   // ← obrigatório
+  content: string;  // HTML ou MDX renderizado
   excerpt?: string;
-  date: string;
-  author: string;
-  content: string; // HTML simples, pode ter emojis
 };

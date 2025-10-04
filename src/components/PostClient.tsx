@@ -1,15 +1,11 @@
+// src/components/PostClient.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import type { Post } from "@/types/post"; // ← usa o MESMO tipo do projeto
+import LikeButton from "@/components/LikeButton";
 
-type Post = {
-  slug: string;
-  title: string;
-  date: string;
-  author: string;
-  content: string;
-};
 
 export default function PostClient({
   slug,
@@ -23,7 +19,6 @@ export default function PostClient({
 
   useEffect(() => {
     try {
-      // Tenta buscar no localStorage sempre
       const arr: Post[] = JSON.parse(localStorage.getItem("extraPosts") || "[]");
       const found = arr.find((p) => p.slug === slug) || initialPost || null;
       setPost(found);
@@ -33,6 +28,8 @@ export default function PostClient({
       setLoading(false);
     }
   }, [slug, initialPost]);
+
+  const backHref = "/blog"; // se não tiver /blog, troque para "/"
 
   if (loading) {
     return (
@@ -50,7 +47,7 @@ export default function PostClient({
           O conteúdo que você tentou abrir não existe ou foi movido.
         </p>
         <div className="mt-6">
-          <Link href="/blog" className="text-blue-600 hover:underline">
+          <Link href={backHref} className="text-blue-600 hover:underline">
             ← Voltar ao Blog
           </Link>
         </div>
@@ -59,22 +56,21 @@ export default function PostClient({
   }
 
   return (
-    <article className="prose prose-zinc mx-auto p-6">
-      <h1 className="mb-2">{post.title}</h1>
+    <article className="prose prose-neutral dark:prose-invert mx-auto p-6">
+      <h1 className="mb-1">{post.title}</h1>
       <p className="text-sm text-zinc-500">
-        {post.date} • {post.author}
+        <time dateTime={post.date}>
+          {new Date(post.date).toLocaleDateString("pt-PT")}
+        </time>{" "}
+        • {post.author}
       </p>
 
-      <div
-        className="mt-6"
-        dangerouslySetInnerHTML={{ __html: post.content }}
-      />
+      <div className="mt-6" dangerouslySetInnerHTML={{ __html: post.content }} />
 
-      <div className="mt-10">
-        <Link href="/blog" className="text-blue-600 hover:underline">
-          ← Voltar ao Blog
-        </Link>
+        <div className="mt-6">
+          <LikeButton slug={slug} />
       </div>
+
     </article>
   );
 }

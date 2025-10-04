@@ -1,7 +1,15 @@
 "use client";
 import { useState } from "react";
 
-export default function PostForm({ onAdd }: { onAdd: (p: any) => void }) {
+export type PostFormOutput = {
+  slug: string;
+  title: string;
+  content: string;
+  date: string;
+  author: string;
+};
+
+export default function PostForm({ onAdd }: { onAdd: (p: PostFormOutput) => void }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
